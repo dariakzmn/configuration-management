@@ -46,3 +46,29 @@ def load_order(graph: dict[str, list[str]]):
         for dependencies in remaining.values():
             dependencies.difference_update(ready)
     return order, []
+
+
+def ascii_tree(root: str, graph: dict[str, list[str]]) -> str:
+    """Format the graph as an iterative ASCII dependency tree."""
+    lines = [root]
+    stack = []
+    children = graph.get(root, [])
+    for index in range(len(children) - 1, -1, -1):
+        child = children[index]
+        stack.append((child, "", index == len(children) - 1, {root}))
+    while stack:
+        node, prefix, is_last, path = stack.pop()
+        marker = "last: " if is_last else "dep: "
+        cycle = node in path
+        suffix = " [cycle]" if cycle else ""
+        lines.append(prefix + marker + node + suffix)
+        if cycle:
+            continue
+        next_prefix = prefix + "  "
+        descendants = graph.get(node, [])
+        next_path = path | {node}
+        for index in range(len(descendants) - 1, -1, -1):
+            child = descendants[index]
+            last = index == len(descendants) - 1
+            stack.append((child, next_prefix, last, next_path))
+    return "\n".join(lines)
