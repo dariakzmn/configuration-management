@@ -1,4 +1,4 @@
-"""Dependency graph construction."""
+"""Dependency graph construction and operations."""
 
 from collections import deque
 
@@ -24,3 +24,25 @@ def build_graph(source, package: str, max_depth: int):
             if dependency not in expanded:
                 queue.append((dependency, depth + 1))
     return root, graph
+
+
+def load_order(graph: dict[str, list[str]]):
+    """Return dependencies-first load order and any cyclic nodes."""
+    remaining = {
+        node: set(dependencies)
+        for node, dependencies in graph.items()
+    }
+    order = []
+    while remaining:
+        ready = sorted(
+            node for node, dependencies in remaining.items()
+            if not dependencies
+        )
+        if not ready:
+            return order, sorted(remaining)
+        for node in ready:
+            order.append(node)
+            remaining.pop(node)
+        for dependencies in remaining.values():
+            dependencies.difference_update(ready)
+    return order, []

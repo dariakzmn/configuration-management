@@ -19,6 +19,7 @@ class Config:
     output: str
     ascii_tree: bool
     max_depth: int
+    load_order: bool
 
 
 def build_parser() -> ArgumentParser:
@@ -32,6 +33,7 @@ def build_parser() -> ArgumentParser:
     parser.add_argument("--output", default="graph.png")
     parser.add_argument("--ascii-tree", action="store_true")
     parser.add_argument("--max-depth", type=int, default=3)
+    parser.add_argument("--load-order", action="store_true")
     return parser
 
 
@@ -52,6 +54,7 @@ def validate_args(namespace) -> Config:
         output=namespace.output,
         ascii_tree=namespace.ascii_tree,
         max_depth=namespace.max_depth,
+        load_order=namespace.load_order,
     )
 
 
