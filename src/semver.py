@@ -24,22 +24,32 @@ def satisfies(version: str, requirement: str) -> bool:
         parts = [part.strip() for part in req.split(",")]
         return all(satisfies(version, part) for part in parts)
     if req.startswith("^"):
-        return _caret(parse_version(version), parse_version(req[1:]))
+        raw = req[1:].strip()
+        return _caret(
+            parse_version(version),
+            parse_version(raw),
+            len(raw.split(".")),
+        )
     if req.startswith("~"):
         return _tilde(parse_version(version), req[1:])
     if req.startswith((">=", "<=", ">", "<", "=")):
         return _compare(parse_version(version), req)
     if "*" in req or "x" in req.lower():
         return _wildcard(parse_version(version), req)
-    return _caret(parse_version(version), parse_version(req))
+    raw = req
+    return _caret(
+        parse_version(version),
+        parse_version(raw),
+        len(raw.split(".")),
+    )
 
 
-def _caret(version, minimum) -> bool:
+def _caret(version, minimum, component_count) -> bool:
     """Implement Cargo caret compatibility bounds."""
     major, minor, patch = minimum
-    if major > 0:
+    if major > 0 or component_count == 1:
         upper = (major + 1, 0, 0)
-    elif minor > 0:
+    elif minor > 0 or component_count == 2:
         upper = (0, minor + 1, 0)
     else:
         upper = (0, 0, patch + 1)

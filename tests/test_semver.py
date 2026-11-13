@@ -16,6 +16,14 @@ class SemverTests(unittest.TestCase):
         self.assertTrue(satisfies("0.4.9", "^0.4.2"))
         self.assertFalse(satisfies("0.5.0", "^0.4.2"))
 
+    def test_abbreviated_zero_requirement(self):
+        self.assertTrue(satisfies("0.9.0", "0"))
+        self.assertFalse(satisfies("1.0.0", "0"))
+
+    def test_two_component_zero_requirement(self):
+        self.assertTrue(satisfies("0.0.9", "0.0"))
+        self.assertFalse(satisfies("0.1.0", "0.0"))
+
     def test_tilde_requirement(self):
         self.assertTrue(satisfies("1.2.9", "~1.2.3"))
         self.assertFalse(satisfies("1.3.0", "~1.2.3"))
