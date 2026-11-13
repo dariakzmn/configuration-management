@@ -3,7 +3,7 @@
 import unittest
 from pathlib import Path
 
-from src.graph import build_graph, load_order
+from src.graph import ascii_tree, build_graph, load_order
 from src.sources import TestRepository
 
 
@@ -44,6 +44,12 @@ class GraphTests(unittest.TestCase):
         order, cyclic = load_order(graph)
         self.assertEqual(order, [])
         self.assertEqual(set(cyclic), {"A", "B", "C"})
+
+    def test_ascii_tree_marks_cycle(self):
+        source = TestRepository(str(DATA / "cycle.json"))
+        root, graph = build_graph(source, "A", 10)
+        text = ascii_tree(root, graph)
+        self.assertIn("[cycle]", text)
 
 
 if __name__ == "__main__":
